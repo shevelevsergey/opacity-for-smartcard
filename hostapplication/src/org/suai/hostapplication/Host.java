@@ -12,19 +12,31 @@ import javax.smartcardio.TerminalFactory;
 
 public class Host {
 
+	/****************************************************
+	 *													*
+	 *	Данный класс отвечает за передачу данных между	*
+	 *			хост приложением и смарт-картой			*
+	 *													*
+	 ****************************************************/
+	 
+	/* Поля класса */
 	private CardTerminal terminal;
 	private Card card;
 	
 	public Host() {
 		try {
 			TerminalFactory factory = TerminalFactory.getDefault();
+			// Получаем список всех доступных считывателей смарт-карт
 			List<CardTerminal> terminals = factory.terminals().list();
+			// Выбираем первый из списка
 			terminal = terminals.get(0);
 		} catch (CardException e) {
 			e.printStackTrace();
 		}
 	}
 	
+	/* Функция для подключения к смарт-карте
+	 		Инициализируется поля класса card */
 	public void connect() {
 		try {
 			card = terminal.connect("*");
@@ -32,6 +44,7 @@ public class Host {
 			e.printStackTrace();
 		}
 	}
+	/* Отключение от смарт-карты */
 	public void disconnect() {
 		try {
 			card.disconnect(false);
@@ -40,6 +53,8 @@ public class Host {
 		}
 	}
 	
+	/* Отправка APDU команды (заголовок + тело)
+		Функция возвращает ответ APDU от смарт-карты */
 	public byte[] sendCommand(byte[] command) {
 		try {
 			CardChannel channel = card.getBasicChannel();
@@ -51,6 +66,9 @@ public class Host {
 		}
 		return null;
 	}
+	
+	/* Отправка APDU команды
+		Функция возвращает ответ APDU от смарт-карты */
 	public byte[] sendCommand(byte[] header, byte[] body) {
 		byte[] command = new byte[header.length + body.length];
 		System.arraycopy(header, 0, command, 0, header.length);
@@ -59,6 +77,7 @@ public class Host {
 		return response;
 	}
 
+	/* Функция возвращает данные из ответа APDU */
 	public byte[] getData(byte[] response) {
 		byte[] data = new byte[response.length - 2];
 		for(int i = 0; i < response.length - 2; i++) {
@@ -66,6 +85,8 @@ public class Host {
 		}
 		return data;
 	}
+	/* Функция возвращает статус выполнения 
+					команды APDU смарт-картой */
 	public byte[] getStatus(byte[] response) {
 		byte[] status = new byte[2];
 		status[0] = response[response.length - 2];

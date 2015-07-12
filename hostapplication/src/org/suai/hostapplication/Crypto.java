@@ -40,6 +40,14 @@ import org.bouncycastle.util.encoders.Hex;
 
 public class Crypto {
 	
+	/*************************************************
+	 *												 *
+	 *	В данном классе реализован протокол OPACITY  *
+	 *				для хост приложения				 *
+	 *												 *
+	 *************************************************/
+	
+	/* Поля класса */
 	private BCECPrivateKey privateKey;
 	private BCECPublicKey publicKey;
 	private BCECPublicKey publicKeySC;
@@ -51,8 +59,10 @@ public class Crypto {
 	private ECParameterSpec ecSpec;
 
 	public Crypto() {
+		// Добавляем криптопровайдер BouncyCastle (находится в папке lib проекта)
 		Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
 		
+		// Параметры эллиптической кривой
 		curve = new ECCurve.Fp(
 	            new BigInteger("fffffffffffffffffffffffffffffffeffffffffffffffff", 16),
 	            new BigInteger("fffffffffffffffffffffffffffffffefffffffffffffffc", 16),
@@ -64,12 +74,15 @@ public class Crypto {
 	            		+ "0afd82ff101207192b95ffc8da78631011ed6b24cdd573f977a11e794811")), 
 	            new BigInteger("ffffffffffffffffffffffff99def836146bc9b1b4d22831", 16));
 		
+		// Инициализирующий вектор для шифрования AES в режиме CBC
 		iv = new byte[16];
 		for(int i = 0; i < 16; i++) {
 			iv[i] = (byte)0;
 		}
 	}
 
+	/* Функция генерирует публичный и приватный ключи EC
+				Ключи записываются в файлы PK.key и SK.key 	*/
 	public void generateKey() {
 		KeyPairGenerator keyGen;
 		try {
@@ -104,6 +117,8 @@ public class Crypto {
 			e.printStackTrace();
 		}
 	}
+	/* Функция загружает ключи из файлов PK.key и SK.key
+		Инициализирует поля класса publicKey и privateKey */
 	public void loadKey() {
 		
 		try {
@@ -136,10 +151,12 @@ public class Crypto {
 		}
 		
 	}
+	/* Функция возвращает публичный ключ в виде массива байт */
 	public byte[] getPK() {
 		return publicKey.getQ().getEncoded();
 	}
 	
+	/* Запись в файл PKS.key публичного ключа смарт-карты */
 	public void setPKS(byte[] pks) {
 		try {
 			FileOutputStream outputStream = new FileOutputStream("PKS.key");
@@ -153,6 +170,9 @@ public class Crypto {
 			e.printStackTrace();
 		}
 	}
+	
+	/* Функция принимает зашифрованный уникальный идентификатор смарт-карты
+		В файл IDC.key записывается рассшифрованный id карты */
 	public void setIDC(byte[] eidC) {
 		
 		try {
@@ -185,6 +205,7 @@ public class Crypto {
 		}
 		
 	}
+	/* Загрузка публичного ключа смарт-карты из локального файла */
 	private void loadPKS() {
 		try {
 			FileInputStream inputStream = new FileInputStream("PKS.key");
@@ -205,6 +226,7 @@ public class Crypto {
 		}
 	}
 	
+	/* Выработка общего секретного ключа AES для авторизации */
 	public void generateSKforAuth(byte[] rnd) {
 		loadPKS();
 		
@@ -235,13 +257,12 @@ public class Crypto {
 		} catch (InvalidKeyException e) {
 			e.printStackTrace();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
+	/* Выработка общего секретного ключа AES для регистрации */
 	public void generateSK(byte[] rnd) {
 		loadPKS();
 		
@@ -265,6 +286,7 @@ public class Crypto {
 			e.printStackTrace();
 		}
 	}
+	/* Аутентификация (для регистрации и авторизации схема одинаковая) */
 	public boolean isAuth(byte[] auth) {
 		try {
 			IvParameterSpec ivSpec = new IvParameterSpec(iv);
@@ -312,6 +334,7 @@ public class Crypto {
 		return false;
 	}
 	
+	/* Генерация случайных данных */
 	public byte[] generateRnd(int length) {
 		SecureRandom rndGen = new SecureRandom();
 		byte[] rnd = new byte[length];
@@ -319,6 +342,8 @@ public class Crypto {
 		return rnd;
 	}
 	
+	/* Функция инициализирует публичный ключ EC
+					На вход принимает массив байт */
 	private PublicKey rawdataToPublicKey(ECParameterSpec parameter, byte[] data) {
 	
 		try {
@@ -337,6 +362,8 @@ public class Crypto {
 		
 		return null;
 	}
+	/* Функция инициализирует приватный ключ EC
+					На вход принимает массив байт */
 	private PrivateKey rawdataToPrivateKey(ECParameterSpec parameter, byte[] data) {
 		
 		try {
@@ -354,6 +381,7 @@ public class Crypto {
 		
 		return null;
 	}
+	/* Конкатенация массивов байт */
 	private byte[] concatArray(byte[] a, byte[] b) {
 		byte[] r = new byte[a.length + b.length];
 		System.arraycopy(a, 0, r, 0, a.length);

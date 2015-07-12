@@ -2,7 +2,6 @@ package org.suai.hostapplication;
 
 public class Main {
 
-	/* Fields */
 	private static int PKW_LENGTH = 49;
 	private static int PKS_LENGTH = 49;
 	private static int RND_LENGTH = 8;
@@ -10,7 +9,7 @@ public class Main {
 	private static int LENGTH16 = 16;
 	private static int LENGTH64 = 64;
 	
-	/* Instruction */
+	/* Инструкции для команды APDU */
 	private static byte[] SELECT = { (byte)0x00, (byte)0xA4, (byte)0x04, (byte)0x00, (byte)0x08, 
     		(byte)0xD4, (byte)0xD4, (byte)0xD4, (byte)0xD4, (byte)0xD4, (byte)0xD4, (byte)0x01, (byte)0x01 };
 	private static byte[] REGISTRATION = { (byte)0xB0, (byte)0x30, (byte)0x00, (byte)0x00, (byte)(PKW_LENGTH + RND_LENGTH) };
@@ -21,6 +20,7 @@ public class Main {
 		auth();
 	}
 	
+	/* Функция для авторизации */
 	public static void auth() {
 		System.out.println("AUTHORIZATION\n========================\n");
 		
@@ -57,6 +57,8 @@ public class Main {
 		
 		host.disconnect();
 	}
+	
+	/* Функция для регистрации */
 	public static void registration() {
 		System.out.println("REGISTRATION\n========================\n");
 		
