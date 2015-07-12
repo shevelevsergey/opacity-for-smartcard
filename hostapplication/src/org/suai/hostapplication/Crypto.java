@@ -40,13 +40,9 @@ import org.bouncycastle.util.encoders.Hex;
 
 public class Crypto {
 	
-	/*************************************************
-	 *												 *
-	 *	В данном классе реализован протокол OPACITY  *
-	 *				для хост приложения				 *
-	 *												 *
-	 *************************************************/
-	
+	/* В данном классе реализован протокол 
+				OPACITY для хост приложения */
+		
 	/* Поля класса */
 	private BCECPrivateKey privateKey;
 	private BCECPublicKey publicKey;
