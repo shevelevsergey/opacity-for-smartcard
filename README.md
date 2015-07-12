@@ -4,3 +4,4 @@ This project is designed to authenticate users to the Web service using contactl
 # Auth
 ![Image alt](https://github.com/shevelevsergey/opacity-for-smartcard/raw/master/image/reg.png)
 ![Image alt](https://github.com/shevelevsergey/opacity-for-smartcard/raw/master/image/auth.png)
+-> This is centered Text <-
